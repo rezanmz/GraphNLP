@@ -12,6 +12,8 @@ torch-geometric
 
 # Huggingface
 transformers==4.17.0
+datasets==2.0.0
 
 # Other
 pytorch-lightning==1.5.10
+autopep8
