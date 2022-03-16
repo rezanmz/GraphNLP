@@ -1,0 +1,7 @@
+# Pytorch-Geometric
+-f https://data.pyg.org/whl/torch-1.11.0+cu115.html
+torch-scatter
+torch-sparse
+torch-cluster
+torch-spline-conv
+torch-geometric
