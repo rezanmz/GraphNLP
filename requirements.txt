@@ -1,5 +1,9 @@
+# Pytorch
+-f https://download.pytorch.org/whl/cu113/torch_stable.html
+torch==1.11.0+cu113
+
 # Pytorch-Geometric
--f https://data.pyg.org/whl/torch-1.11.0+cu115.html
+-f https://data.pyg.org/whl/torch-1.11.0+cu113.html
 torch-scatter
 torch-sparse
 torch-cluster
