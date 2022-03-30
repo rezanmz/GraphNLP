@@ -5,12 +5,14 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from models.kd_model import KDModel
 
 dataset = datasets.load_dataset('ag_news')
-train_data = dataset['train']['text'][:200]
-val_data = dataset['test']['text'][:100]
+train_data = dataset['train']
+val_data = dataset['test']
 
 logger = TensorBoardLogger('logs', name='kd_model')
-trainer = pl.Trainer(max_epochs=100, logger=logger)
+trainer = pl.Trainer(max_epochs=100, logger=logger,
+                     accelerator="gpu", devices=-1, strategy='ddp')
 model = KDModel(
+    batch_size=16,
     num_feats=768,  # must match initial_embedding_model
     edge_construction_hidden_dims=[],
     feature_construction_hidden_dims=[],

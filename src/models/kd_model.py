@@ -10,6 +10,7 @@ from models.student_model import StudentModel
 class KDModel(pl.LightningModule):
     def __init__(
         self,
+        batch_size: int,
         num_feats: int,
         edge_construction_hidden_dims: List[int],
         feature_construction_hidden_dims: List[int],
@@ -40,23 +41,24 @@ class KDModel(pl.LightningModule):
 
         self.train_data = train_data
         self.val_data = val_data
+        self.batch_size = batch_size
 
     def training_step(self, batch, batch_idx):
-        sentence = batch
-        student_tokenized_sentence = self.student_tokenizer(
-            sentence, return_tensors='pt').to(self.device)
-        teacher_tokenized_sentence = self.teacher_tokenizer(
-            sentence, return_tensors='pt').to(self.device)
+        student_input_ids, student_attention_mask, teacher_input_ids, teacher_attention_mask = batch
+        # student_tokenized_sentence = self.student_tokenizer(
+        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
+        # teacher_tokenized_sentence = self.teacher_tokenizer(
+        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
 
         # Teacher model
         with torch.no_grad():
             teacher_output = self.teacher_model(
-                **teacher_tokenized_sentence).last_hidden_state.mean(1)
+                input_ids=teacher_input_ids, attention_mask=teacher_attention_mask).last_hidden_state[:, 0, :]
 
         # Student model
         with torch.no_grad():
             initial_embeddings = self.initial_embedding_model(
-                **student_tokenized_sentence).last_hidden_state
+                input_ids=student_input_ids, attention_mask=student_attention_mask).last_hidden_state
         student_output = self.student_model(initial_embeddings).mean(1)
 
         loss = F.mse_loss(student_output, teacher_output)
@@ -65,21 +67,22 @@ class KDModel(pl.LightningModule):
         return {'loss': loss}
 
     def validation_step(self, batch, batch_idx):
-        sentence = batch
-        student_tokenized_sentence = self.student_tokenizer(
-            sentence, return_tensors='pt').to(self.device)
-        teacher_tokenized_sentence = self.teacher_tokenizer(
-            sentence, return_tensors='pt').to(self.device)
+        student_input_ids, student_attention_mask, teacher_input_ids, teacher_attention_mask = batch
+        # sentence = batch
+        # student_tokenized_sentence = self.student_tokenizer(
+        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
+        # teacher_tokenized_sentence = self.teacher_tokenizer(
+        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
 
         # Teacher model
         with torch.no_grad():
             teacher_output = self.teacher_model(
-                **teacher_tokenized_sentence).last_hidden_state.mean(1)
+                input_ids=teacher_input_ids, attention_mask=teacher_attention_mask).last_hidden_state[:, 0, :]
 
         # Student model
         with torch.no_grad():
             initial_embeddings = self.initial_embedding_model(
-                **student_tokenized_sentence).last_hidden_state
+                input_ids=student_input_ids, attention_mask=student_attention_mask).last_hidden_state
         student_output = self.student_model(initial_embeddings).mean(1)
 
         loss = F.mse_loss(student_output, teacher_output)
@@ -87,10 +90,30 @@ class KDModel(pl.LightningModule):
         return {'loss': loss}
 
     def train_dataloader(self):
-        return DataLoader(self.train_data, batch_size=1, shuffle=True, num_workers=8)
+        student_data = self.train_data.map(lambda e: self.student_tokenizer(
+            e['text'], truncation=True, padding='max_length', max_length=128), batched=True)
+        student_data.set_format(type='torch', columns=[
+                                'input_ids', 'attention_mask', 'label'])
+        teacher_data = self.train_data.map(lambda e: self.teacher_tokenizer(
+            e['text'], truncation=True, padding='max_length', max_length=128), batched=True)
+        teacher_data.set_format(type='torch', columns=[
+                                'input_ids', 'attention_mask', 'label'])
+        dataset = torch.utils.data.TensorDataset(
+            student_data['input_ids'], student_data['attention_mask'], teacher_data['input_ids'], teacher_data['attention_mask'])
+        return DataLoader(dataset, batch_size=self.batch_size, shuffle=True, num_workers=48)
 
     def val_dataloader(self):
-        return DataLoader(self.val_data, batch_size=1, shuffle=True, num_workers=8)
+        student_data = self.val_data.map(lambda e: self.student_tokenizer(
+            e['text'], truncation=True, padding='max_length', max_length=128), batched=True)
+        student_data.set_format(type='torch', columns=[
+                                'input_ids', 'attention_mask', 'label'])
+        teacher_data = self.val_data.map(lambda e: self.teacher_tokenizer(
+            e['text'], truncation=True, padding='max_length', max_length=128), batched=True)
+        teacher_data.set_format(type='torch', columns=[
+                                'input_ids', 'attention_mask', 'label'])
+        dataset = torch.utils.data.TensorDataset(
+            student_data['input_ids'], student_data['attention_mask'], teacher_data['input_ids'], teacher_data['attention_mask'])
+        return DataLoader(dataset, batch_size=self.batch_size, num_workers=48)
 
     def configure_optimizers(self):
         return torch.optim.RMSprop(self.student_model.parameters())

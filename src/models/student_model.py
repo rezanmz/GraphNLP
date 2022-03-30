@@ -24,14 +24,23 @@ class StudentModel(nn.Module):
                        gcn_hidden_dims, gcn_output_dim)
 
     def forward(self, features):
-        features = features.squeeze()
+        n_samples = features.size(0)
+        n_tokens = features.size(1)
+        embedding_dim = features.size(2)
+
         pairwise_features = torch.cartesian_prod(torch.tensor(
-            range(features.shape[0])), torch.tensor(range(features.shape[0])))
-        pairwise_features = torch.stack([torch.stack(
-            [features[idx[0]], features[idx[1]]]).flatten() for idx in pairwise_features])
+            range(n_tokens)), torch.tensor(range(n_tokens)))
+        pairwise_features = torch.concat([features[sample][pairwise_features].view(
+            pairwise_features.size(0), -1) for sample in range(n_samples)])
 
         edge_construction_output = self.edge_construction(pairwise_features)
+        edge_construction_output = edge_construction_output.view(
+            n_samples, n_tokens, n_tokens)
+
+        features = features.view(-1, embedding_dim)
         feature_construction_output = self.feature_construction(features)
+        feature_construction_output = feature_construction_output.view(
+            n_samples, n_tokens, -1)
 
         gcn_output = self.gcn(edge_construction_output,
                               feature_construction_output)
