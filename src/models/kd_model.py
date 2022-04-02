@@ -39,16 +39,14 @@ class KDModel(pl.LightningModule):
             'roberta-base')
         self.teacher_model = RobertaModel.from_pretrained('roberta-base')
 
+        self.loss_fn = lambda x, y: 1 - F.cosine_similarity(x, y).mean()
+
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
 
     def training_step(self, batch, batch_idx):
         student_input_ids, student_attention_mask, teacher_input_ids, teacher_attention_mask = batch
-        # student_tokenized_sentence = self.student_tokenizer(
-        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
-        # teacher_tokenized_sentence = self.teacher_tokenizer(
-        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
 
         # Teacher model
         with torch.no_grad():
@@ -59,20 +57,15 @@ class KDModel(pl.LightningModule):
         with torch.no_grad():
             initial_embeddings = self.initial_embedding_model(
                 input_ids=student_input_ids, attention_mask=student_attention_mask).last_hidden_state
-        student_output = self.student_model(initial_embeddings).mean(1)
+        student_output = self.student_model(
+            initial_embeddings, student_attention_mask).mean(1)
 
-        loss = F.mse_loss(student_output, teacher_output)
-        self.log('train_loss', loss, prog_bar=True,
-                 on_step=False, on_epoch=True)
+        loss = self.loss_fn(student_output, teacher_output)
+        self.log('train_loss', loss)
         return {'loss': loss}
 
     def validation_step(self, batch, batch_idx):
         student_input_ids, student_attention_mask, teacher_input_ids, teacher_attention_mask = batch
-        # sentence = batch
-        # student_tokenized_sentence = self.student_tokenizer(
-        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
-        # teacher_tokenized_sentence = self.teacher_tokenizer(
-        #     sentence, return_tensors='pt', padding=True, truncation=True).to(self.device)
 
         # Teacher model
         with torch.no_grad():
@@ -83,10 +76,11 @@ class KDModel(pl.LightningModule):
         with torch.no_grad():
             initial_embeddings = self.initial_embedding_model(
                 input_ids=student_input_ids, attention_mask=student_attention_mask).last_hidden_state
-        student_output = self.student_model(initial_embeddings).mean(1)
+        student_output = self.student_model(
+            initial_embeddings, student_attention_mask).mean(1)
 
-        loss = F.mse_loss(student_output, teacher_output)
-        self.log('val_loss', loss, prog_bar=True, on_step=False, on_epoch=True)
+        loss = self.loss_fn(student_output, teacher_output)
+        self.log('val_loss', loss)
         return {'loss': loss}
 
     def train_dataloader(self):

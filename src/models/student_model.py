@@ -23,7 +23,7 @@ class StudentModel(nn.Module):
         self.gcn = GCN(feature_construction_output_dim,
                        gcn_hidden_dims, gcn_output_dim)
 
-    def forward(self, features):
+    def forward(self, features, attention_mask):
         n_samples = features.size(0)
         n_tokens = features.size(1)
         embedding_dim = features.size(2)
@@ -43,6 +43,6 @@ class StudentModel(nn.Module):
             n_samples, n_tokens, -1)
 
         gcn_output = self.gcn(edge_construction_output,
-                              feature_construction_output)
+                              feature_construction_output, attention_mask)
 
         return gcn_output

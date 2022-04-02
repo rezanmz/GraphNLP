@@ -12,7 +12,7 @@ logger = TensorBoardLogger('logs', name='kd_model')
 trainer = pl.Trainer(max_epochs=100, logger=logger,
                      accelerator="gpu", devices=-1, strategy='ddp')
 model = KDModel(
-    batch_size=16,
+    batch_size=32,
     num_feats=768,  # must match initial_embedding_model
     edge_construction_hidden_dims=[],
     feature_construction_hidden_dims=[],

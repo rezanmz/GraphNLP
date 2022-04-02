@@ -53,9 +53,9 @@ class GCN(nn.Module):
 
         self.activation = nn.ReLU()
 
-    def forward(self, adj, features):
+    def forward(self, adj, features, attention_mask):
         for layer in self.gcn_conv[:-1]:
-            features = layer(features, adj)
+            features = layer(features, adj, mask=attention_mask)
             features = self.activation(features)
-        features = self.gcn_conv[-1](features, adj)
+        features = self.gcn_conv[-1](features, adj, mask=attention_mask)
         return features
