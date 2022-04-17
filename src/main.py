@@ -15,7 +15,7 @@ def run(**kwargs):
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     dataset = load_datasets(
         kwargs['datasets'],
-        cache_dir=os.path.join(kwargs['huggingface_cache'], 'datasets')
+        cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'datasets')
     )
     train_data = dataset['train']
     validation_data = dataset['validation']
@@ -52,7 +52,7 @@ def run(**kwargs):
         gcn_hidden_dims=kwargs['gcn_hidden_dims'],
         feature_construction_output_dim=kwargs['feature_construction_output_dim'],
         gcn_output_dim=kwargs['gcn_output_dim'],  # must match teacher_model
-        cache_dir=os.path.join(kwargs['huggingface_cache'], 'transformers')
+        cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
     )
 
     logger = WandbLogger(
