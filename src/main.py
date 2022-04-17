@@ -1,5 +1,4 @@
 import argparse
-from ast import arg
 import os
 
 import pytorch_lightning as pl
@@ -16,7 +15,7 @@ def run(**kwargs):
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     dataset = load_datasets(
         kwargs['datasets'],
-        cache_dir=kwargs['cache_dir']
+        cache_dir=kwargs['huggingface_cache_dir'] + '/datasets'
     )
     train_data = dataset['train']
     validation_data = dataset['validation']
@@ -53,6 +52,7 @@ def run(**kwargs):
         gcn_hidden_dims=kwargs['gcn_hidden_dims'],
         feature_construction_output_dim=kwargs['feature_construction_output_dim'],
         gcn_output_dim=kwargs['gcn_output_dim'],  # must match teacher_model
+        cache_dir=kwargs['huggingface_cache_dir'] + '/transformers'
     )
 
     logger = WandbLogger(
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     argparser.add_argument('--max-epochs', type=int, default=100)
     argparser.add_argument('--num-gpus', type=int, default=1)
     argparser.add_argument('--num-nodes', type=int, default=1)
-    argparse.add_argument('--huggingface-cache-dir',
-                          type=str, default='~/.cache/huggingface/datasets')
+    argparser.add_argument('--huggingface-cache-dir',
+                           type=str, default='~/.cache/huggingface')
     argparser.add_argument('--wandb-project', type=str, default='graph-nlp')
     argparser.add_argument('--offline', action='store_true')
     argparser.add_argument('--no-offline', action='store_false')

@@ -1,4 +1,5 @@
 from typing import List
+
 from torch import nn
 from torch_geometric.nn.dense import DenseGCNConv
 

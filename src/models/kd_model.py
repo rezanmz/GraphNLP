@@ -1,9 +1,10 @@
-import torch
-from torch.utils.data import DataLoader
-from torch.nn import functional as F
-import pytorch_lightning as pl
-from transformers import AutoTokenizer, AutoModel
 from typing import List
+
+import pytorch_lightning as pl
+import torch
+from torch.nn import functional as F
+from transformers import AutoModel, AutoTokenizer
+
 from models.student_model import StudentModel
 
 
@@ -18,13 +19,18 @@ class KDModel(pl.LightningModule):
         gcn_output_dim: int,
         initial_embedding_model: str,
         teacher_model: str,
+        cache_dir: str
     ):
         super().__init__()
 
         self.student_tokenizer = AutoTokenizer.from_pretrained(
-            initial_embedding_model)
+            initial_embedding_model,
+            cache_dir=cache_dir
+        )
         self.initial_embedding_model = AutoModel.from_pretrained(
-            initial_embedding_model)
+            initial_embedding_model,
+            cache_dir=cache_dir
+        )
         self.student_model = StudentModel(
             num_feats,
             edge_construction_hidden_dims,
@@ -34,8 +40,14 @@ class KDModel(pl.LightningModule):
             gcn_output_dim
         )
 
-        self.teacher_tokenizer = AutoTokenizer.from_pretrained(teacher_model)
-        self.teacher_model = AutoModel.from_pretrained(teacher_model)
+        self.teacher_tokenizer = AutoTokenizer.from_pretrained(
+            teacher_model,
+            cache_dir=cache_dir
+        )
+        self.teacher_model = AutoModel.from_pretrained(
+            teacher_model,
+            cache_dir=cache_dir
+        )
 
         self.loss_fn = lambda x, y: 1 - F.cosine_similarity(x, y).mean()
 
