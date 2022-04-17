@@ -147,3 +147,4 @@ cython_debug/
 .vscode/
 on_load.sh
 logs/
+wandb/
