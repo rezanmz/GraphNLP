@@ -22,8 +22,13 @@ def run(**kwargs):
 
     # Tokenizers
     student_tokenizer = AutoTokenizer.from_pretrained(
-        kwargs['initial_embedding_model'])
-    teacher_tokenizer = AutoTokenizer.from_pretrained(kwargs['teacher_model'])
+        kwargs['initial_embedding_model'],
+        cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
+    )
+    teacher_tokenizer = AutoTokenizer.from_pretrained(
+        kwargs['teacher_model']
+        cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
+    )
 
     # Dataloaders
     train_dataloader = get_dataloader(
