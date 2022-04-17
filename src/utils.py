@@ -5,25 +5,25 @@ import torch
 from datasets import Dataset, DatasetDict
 
 
-def load_datasets(dataset_names: List[str]):
+def load_datasets(dataset_names: List[str], cache_dir: str):
     train, validation, test = [], [], []
     if 'ag_news' in dataset_names:
-        dataset = datasets.load_dataset('ag_news')
+        dataset = datasets.load_dataset('ag_news', cache_dir=cache_dir)
         train.extend(dataset['train']['text'])
         test.extend(dataset['test']['text'])
     if 'glue' in dataset_names:
         # cola
-        dataset = datasets.load_dataset('glue', 'cola')
+        dataset = datasets.load_dataset('glue', 'cola', cache_dir=cache_dir)
         train.extend(dataset['train']['sentence'])
         validation.extend(dataset['validation']['sentence'])
         test.extend(dataset['test']['sentence'])
         # sst2
-        dataset = datasets.load_dataset('glue', 'sst2')
+        dataset = datasets.load_dataset('glue', 'sst2', cache_dir=cache_dir)
         train.extend(dataset['train']['sentence'])
         validation.extend(dataset['validation']['sentence'])
         test.extend(dataset['test']['sentence'])
         # mrpc
-        dataset = datasets.load_dataset('glue', 'mrpc')
+        dataset = datasets.load_dataset('glue', 'mrpc', cache_dir=cache_dir)
         train.extend(dataset['train']['sentence1'])
         train.extend(dataset['train']['sentence2'])
         validation.extend(dataset['validation']['sentence1'])
@@ -31,7 +31,7 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test']['sentence1'])
         test.extend(dataset['test']['sentence2'])
         # qqp
-        dataset = datasets.load_dataset('glue', 'qqp')
+        dataset = datasets.load_dataset('glue', 'qqp', cache_dir=cache_dir)
         train.extend(dataset['train']['question1'])
         train.extend(dataset['train']['question2'])
         validation.extend(dataset['validation']['question1'])
@@ -39,7 +39,7 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test']['question1'])
         test.extend(dataset['test']['question2'])
         # stsb
-        dataset = datasets.load_dataset('glue', 'stsb')
+        dataset = datasets.load_dataset('glue', 'stsb', cache_dir=cache_dir)
         train.extend(dataset['train']['sentence1'])
         train.extend(dataset['train']['sentence2'])
         validation.extend(dataset['validation']['sentence1'])
@@ -47,7 +47,7 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test']['sentence1'])
         test.extend(dataset['test']['sentence2'])
         # mnli
-        dataset = datasets.load_dataset('glue', 'mnli')
+        dataset = datasets.load_dataset('glue', 'mnli', cache_dir=cache_dir)
         train.extend(dataset['train']['premise'])
         train.extend(dataset['train']['hypothesis'])
         validation.extend(dataset['validation_matched']['premise'])
@@ -59,7 +59,8 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test_mismatched']['premise'])
         test.extend(dataset['test_mismatched']['hypothesis'])
         # qnli
-        dataset = datasets.load_dataset('glue', 'qnli')
+        dataset = datasets.load_dataset(
+            'glue', 'qnli',     cache_dir=cache_dir)
         train.extend(dataset['train']['question'])
         train.extend(dataset['train']['sentence'])
         validation.extend(dataset['validation']['question'])
@@ -67,7 +68,7 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test']['question'])
         test.extend(dataset['test']['sentence'])
         # rte
-        dataset = datasets.load_dataset('glue', 'rte')
+        dataset = datasets.load_dataset('glue', 'rte', cache_dir=cache_dir)
         train.extend(dataset['train']['sentence1'])
         train.extend(dataset['train']['sentence2'])
         validation.extend(dataset['validation']['sentence1'])
@@ -75,7 +76,7 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test']['sentence1'])
         test.extend(dataset['test']['sentence2'])
         # wnli
-        dataset = datasets.load_dataset('glue', 'wnli')
+        dataset = datasets.load_dataset('glue', 'wnli', cache_dir=cache_dir)
         train.extend(dataset['train']['sentence1'])
         train.extend(dataset['train']['sentence2'])
         validation.extend(dataset['validation']['sentence1'])
@@ -83,7 +84,7 @@ def load_datasets(dataset_names: List[str]):
         test.extend(dataset['test']['sentence1'])
         test.extend(dataset['test']['sentence2'])
         # ax
-        dataset = datasets.load_dataset('glue', 'ax')
+        dataset = datasets.load_dataset('glue', 'ax', cache_dir=cache_dir)
         test.extend(dataset['test']['premise'])
         test.extend(dataset['test']['hypothesis'])
 

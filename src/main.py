@@ -14,7 +14,10 @@ logging.set_verbosity_error()
 
 def run(**kwargs):
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    dataset = load_datasets(kwargs['datasets'])
+    dataset = load_datasets(
+        kwargs['datasets'],
+        cache_dir=kwargs['cache_dir']
+    )
     train_data = dataset['train']
     validation_data = dataset['validation']
 
@@ -88,6 +91,10 @@ if __name__ == '__main__':
         '--feature-construction-output-dim', type=int, default=512)
     argparser.add_argument('--gcn-output-dim', type=int, default=768)
     argparser.add_argument('--max-epochs', type=int, default=100)
+    argparser.add_argument('--num-gpus', type=int, default=1)
+    argparser.add_argument('--num-nodes', type=int, default=1)
+    argparse.add_argument('--huggingface-cache-dir',
+                          type=str, default='~/.cache/huggingface/datasets')
     argparser.add_argument('--wandb-project', type=str, default='graph-nlp')
     argparser.add_argument('--offline', action='store_true')
     argparser.add_argument('--no-offline', action='store_false')

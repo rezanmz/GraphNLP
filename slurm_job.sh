@@ -25,5 +25,8 @@ srun python src/main.py \
     --feature-construction-output-dim 512 \
     --gcn-output-dim 768 \
     --max-epochs 100 \
-    --wandb-project graph-nlp
-    --offline
+    --wandb-project graph-nlp \
+    --offline \
+    --huggingface-cache-dir path/to/datasets/cache/dir \
+    --num-gpus 4 \
+    --num-nodes 2
