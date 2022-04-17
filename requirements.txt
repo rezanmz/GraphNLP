@@ -16,4 +16,5 @@ datasets==2.0.0
 
 # Other
 pytorch-lightning==1.5.10
+wandb
 autopep8
