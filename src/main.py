@@ -26,7 +26,7 @@ def run(**kwargs):
         cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
     )
     teacher_tokenizer = AutoTokenizer.from_pretrained(
-        kwargs['teacher_model']
+        kwargs['teacher_model'],
         cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
     )
 
@@ -71,7 +71,8 @@ def run(**kwargs):
         accelerator="gpu",
         devices=kwargs['num_gpus'],
         num_nodes=kwargs['num_nodes'],
-        logger=logger
+        logger=logger,
+        strategy='ddp'
     )
 
     trainer.fit(model, train_dataloader, validation_dataloader)
