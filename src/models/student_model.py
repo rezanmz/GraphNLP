@@ -42,7 +42,10 @@ class StudentModel(nn.Module):
         feature_construction_output = feature_construction_output.view(
             n_samples, n_tokens, -1)
 
-        gcn_output = self.gcn(edge_construction_output,
-                              feature_construction_output, attention_mask)
+        gcn_output = self.gcn(
+            edge_construction_output,
+            feature_construction_output,
+            attention_mask
+        )
 
-        return gcn_output
+        return torch.tanh(gcn_output)
