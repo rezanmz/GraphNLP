@@ -3,7 +3,7 @@ from typing import List
 import pytorch_lightning as pl
 import torch
 from torch.nn import functional as F
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel
 
 from models.student_model import StudentModel
 
@@ -23,10 +23,6 @@ class KDModel(pl.LightningModule):
     ):
         super().__init__()
 
-        self.student_tokenizer = AutoTokenizer.from_pretrained(
-            initial_embedding_model,
-            cache_dir=cache_dir
-        )
         self.initial_embedding_model = AutoModel.from_pretrained(
             initial_embedding_model,
             cache_dir=cache_dir
@@ -38,11 +34,6 @@ class KDModel(pl.LightningModule):
             gcn_hidden_dims,
             feature_construction_output_dim,
             gcn_output_dim
-        )
-
-        self.teacher_tokenizer = AutoTokenizer.from_pretrained(
-            teacher_model,
-            cache_dir=cache_dir
         )
         self.teacher_model = AutoModel.from_pretrained(
             teacher_model,
