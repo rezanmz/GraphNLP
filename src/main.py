@@ -68,8 +68,8 @@ def run(**kwargs):
 
     trainer = pl.Trainer(
         max_epochs=kwargs['max_epochs'],
-        accelerator="gpu",
-        devices=kwargs['num_gpus'],
+        accelerator='gpu',
+        devices=-1,
         num_nodes=kwargs['num_nodes'],
         logger=logger,
         strategy='ddp'
@@ -97,7 +97,6 @@ if __name__ == '__main__':
         '--feature-construction-output-dim', type=int, default=512)
     argparser.add_argument('--gcn-output-dim', type=int, default=768)
     argparser.add_argument('--max-epochs', type=int, default=100)
-    argparser.add_argument('--num-gpus', type=int, default=1)
     argparser.add_argument('--num-nodes', type=int, default=1)
     argparser.add_argument('--huggingface-cache-dir',
                            type=str, default='~/.cache/huggingface')

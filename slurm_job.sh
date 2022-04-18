@@ -19,14 +19,13 @@ srun python src/main.py \
     --num-workers 4 \
     --datasets glue \
     --num-feats 768 \
-    # --edge-construction-hidden-dims \
-    # --feature-construction-hidden-dims \
-    # --gcn-hidden-dims \
     --feature-construction-output-dim 512 \
     --gcn-output-dim 768 \
     --max-epochs 100 \
     --wandb-project graph-nlp \
     --offline \
     --huggingface-cache-dir path/to/datasets/cache/dir \
-    --num-gpus 4 \
     --num-nodes 2
+# --edge-construction-hidden-dims \
+# --feature-construction-hidden-dims \
+# --gcn-hidden-dims \
