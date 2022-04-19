@@ -30,7 +30,7 @@ class StudentModel(nn.Module):
 
         pairwise_features = torch.cartesian_prod(torch.tensor(
             range(n_tokens)), torch.tensor(range(n_tokens)))
-        pairwise_features = torch.concat([features[sample][pairwise_features].view(
+        pairwise_features = torch.cat([features[sample][pairwise_features].view(
             pairwise_features.size(0), -1) for sample in range(n_samples)])
 
         edge_construction_output = self.edge_construction(pairwise_features)
