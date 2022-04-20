@@ -71,7 +71,7 @@ def run(**kwargs):
     checkpoint_callback = ModelCheckpoint(
         dirpath=kwargs['checkpoints_dir'],
         save_top_k=kwargs['checkpoint_save_top_k'],
-        filename='epoch={epoch}-loss={train_loss:.2f}-val_loss={val_loss:.2f}'
+        filename='{epoch}-{train_loss:.2f}-{val_loss:.2f}'
     )
 
     trainer = pl.Trainer(
