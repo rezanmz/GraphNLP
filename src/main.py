@@ -53,9 +53,11 @@ def run(**kwargs):
         initial_embedding_model=kwargs['initial_embedding_model'],
         teacher_model=kwargs['teacher_model'],
         num_feats=kwargs['num_feats'],  # must match initial_embedding_model
-        edge_construction_hidden_dims=kwargs['edge_construction_hidden_dims'],
-        feature_construction_hidden_dims=kwargs['feature_construction_hidden_dims'],
-        gcn_hidden_dims=kwargs['gcn_hidden_dims'],
+        edge_construction_hidden_dims=[
+            int(i) for i in kwargs['edge_construction_hidden_dims']],
+        feature_construction_hidden_dims=[
+            int(i) for i in kwargs['feature_construction_hidden_dims']],
+        gcn_hidden_dims=[int(i) for i in kwargs['gcn_hidden_dims']],
         feature_construction_output_dim=kwargs['feature_construction_output_dim'],
         gcn_output_dim=kwargs['gcn_output_dim'],  # must match teacher_model
         cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
