@@ -34,11 +34,12 @@ class FeatureConstruction(nn.Module):
         for in_dim, out_dim in zip(hidden_dims[:-1], hidden_dims[1:]):
             self.linear.append(nn.ReLU())
             self.linear.append(nn.Linear(in_dim, out_dim))
+        self.norm = nn.LayerNorm(output_dim, eps=1e-12)
 
     def forward(self, x):
         for layer in self.linear:
             x = layer(x)
-        return x
+        return self.norm(x)
 
 
 class GCN(nn.Module):
