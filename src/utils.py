@@ -103,13 +103,10 @@ def load_datasets(dataset_names: List[str], cache_dir: str):
     })
 
 
-def get_dataloader(
+def get_tensordataset(
     data,
     student_tokenizer,
     teacher_tokenizer,
-    batch_size,
-    shuffle,
-    num_workers,
 ):
     student_data = data.map(
         lambda e: student_tokenizer(
@@ -137,15 +134,9 @@ def get_dataloader(
         type='torch',
         columns=['input_ids', 'attention_mask']
     )
-    dataset = torch.utils.data.TensorDataset(
+    return torch.utils.data.TensorDataset(
         student_data['input_ids'],
         student_data['attention_mask'],
         teacher_data['input_ids'],
         teacher_data['attention_mask']
-    )
-    return torch.utils.data.DataLoader(
-        dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        shuffle=shuffle
     )

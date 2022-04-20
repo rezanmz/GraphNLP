@@ -7,7 +7,7 @@ from pytorch_lightning.loggers import WandbLogger
 from transformers import AutoTokenizer, logging
 
 from models.kd_model import KDModel
-from utils import get_dataloader, load_datasets
+from utils import get_tensordataset, load_datasets
 
 logging.set_verbosity_error()
 
@@ -32,21 +32,15 @@ def run(**kwargs):
     )
 
     # Dataloaders
-    train_dataloader = get_dataloader(
+    train_dataset = get_tensordataset(
         data=train_data,
         student_tokenizer=student_tokenizer,
         teacher_tokenizer=teacher_tokenizer,
-        batch_size=kwargs['batch_size'],
-        shuffle=True,
-        num_workers=kwargs['num_workers']
     )
-    validation_dataloader = get_dataloader(
+    validation_dataset = get_tensordataset(
         data=validation_data,
         student_tokenizer=student_tokenizer,
         teacher_tokenizer=teacher_tokenizer,
-        batch_size=kwargs['batch_size'],
-        shuffle=False,
-        num_workers=kwargs['num_workers']
     )
 
     model = KDModel(
@@ -60,7 +54,12 @@ def run(**kwargs):
         gcn_hidden_dims=[int(i) for i in kwargs['gcn_hidden_dims']],
         feature_construction_output_dim=kwargs['feature_construction_output_dim'],
         gcn_output_dim=kwargs['gcn_output_dim'],  # must match teacher_model
-        cache_dir=os.path.join(kwargs['huggingface_cache_dir'], 'transformers')
+        cache_dir=os.path.join(
+            kwargs['huggingface_cache_dir'], 'transformers'),
+        batch_size=kwargs['batch_size'],
+        train_dataset=train_dataset,
+        validation_dataset=validation_dataset,
+        num_workers=kwargs['num_workers'],
     )
 
     logger = WandbLogger(
@@ -82,10 +81,11 @@ def run(**kwargs):
         devices=-1,
         num_nodes=kwargs['num_nodes'],
         logger=logger,
-        strategy='ddp'
+        strategy='ddp',
+        auto_scale_batch_size=True
     )
 
-    trainer.fit(model, train_dataloader, validation_dataloader)
+    trainer.fit(model)
 
 
 if __name__ == '__main__':

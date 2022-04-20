@@ -19,7 +19,11 @@ class KDModel(pl.LightningModule):
         gcn_output_dim: int,
         initial_embedding_model: str,
         teacher_model: str,
-        cache_dir: str
+        cache_dir: str,
+        batch_size: int,
+        train_dataset: torch.utils.data.TensorDataset,
+        validation_dataset: torch.utils.data.TensorDataset,
+        num_workers: int,
     ):
         super().__init__()
 
@@ -41,6 +45,11 @@ class KDModel(pl.LightningModule):
         )
 
         self.loss_fn = lambda x, y: 1 - F.cosine_similarity(x, y).mean()
+
+        self.batch_size = batch_size
+        self.train_dataset = train_dataset
+        self.val_dataset = validation_dataset
+        self.num_workers = num_workers
 
     def common_step(self, batch, batch_idx):
         student_input_ids, student_attention_mask, teacher_input_ids, teacher_attention_mask = batch
@@ -78,3 +87,19 @@ class KDModel(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.RMSprop(self.student_model.parameters())
+
+    def train_dataloader(self):
+        return torch.utils.data.DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers
+        )
+
+    def val_dataloader(self):
+        return torch.utils.data.DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers
+        )
