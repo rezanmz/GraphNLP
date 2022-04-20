@@ -2,6 +2,7 @@ import argparse
 import os
 
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from transformers import AutoTokenizer, logging
 
@@ -66,8 +67,15 @@ def run(**kwargs):
     )
     logger.watch(model)
 
+    checkpoint_callback = ModelCheckpoint(
+        dirpath=kwargs['checkpoints_dir'],
+        save_top_k=kwargs['checkpoint_save_top_k'],
+        filename='epoch={epoch}-loss={train_loss:.2f}-val_loss={val_loss:.2f}'
+    )
+
     trainer = pl.Trainer(
         max_epochs=kwargs['max_epochs'],
+        callbacks=[checkpoint_callback],
         accelerator='gpu',
         devices=-1,
         num_nodes=kwargs['num_nodes'],
@@ -103,6 +111,9 @@ if __name__ == '__main__':
     argparser.add_argument('--wandb-project', type=str, default='graph-nlp')
     argparser.add_argument('--offline', action='store_true')
     argparser.add_argument('--no-offline', action='store_false')
+    argparser.add_argument('--checkpoints-dir',
+                           type=str, default='checkpoints')
+    argparser.add_argument('--checkpoint-save-top-k', type=int, default=-1)
     argparser.set_defaults(offline=False)
 
     args = argparser.parse_args()

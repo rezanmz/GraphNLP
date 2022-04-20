@@ -34,6 +34,8 @@ srun python src/main.py \
     --offline \
     --huggingface-cache-dir ./huggingface-cache \
     --num-nodes 2
+    --checkpoints-dir ./checkpoints \
+    --checkpoint-save-top-k -1
 # --edge-construction-hidden-dims \
 # --feature-construction-hidden-dims \
 # --gcn-hidden-dims \
