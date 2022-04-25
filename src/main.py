@@ -82,7 +82,7 @@ def run(**kwargs):
         num_nodes=kwargs['num_nodes'],
         logger=logger,
         strategy='ddp',
-        auto_scale_batch_size=True
+        val_check_interval=0.25
     )
 
     trainer.fit(model)

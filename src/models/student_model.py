@@ -48,4 +48,4 @@ class StudentModel(nn.Module):
             attention_mask
         )
 
-        return torch.tanh(gcn_output)
+        return gcn_output

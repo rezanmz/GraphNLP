@@ -34,7 +34,8 @@ class FeatureConstruction(nn.Module):
         for in_dim, out_dim in zip(hidden_dims[:-1], hidden_dims[1:]):
             self.linear.append(nn.ReLU())
             self.linear.append(nn.Linear(in_dim, out_dim))
-        self.norm = nn.LayerNorm(output_dim, eps=1e-12)
+
+        self.norm = nn.BatchNorm1d(output_dim)
 
     def forward(self, x):
         for layer in self.linear:
@@ -53,11 +54,12 @@ class GCN(nn.Module):
         for in_dim, out_dim in zip(hidden_dims[:-1], hidden_dims[1:]):
             self.gcn_conv.append(DenseGCNConv(in_dim, out_dim))
 
-        self.activation = nn.ReLU()
+        self.gcn_activation = nn.ReLU()
+        self.output_activation = nn.Tanh()
 
     def forward(self, adj, features, attention_mask):
         for layer in self.gcn_conv[:-1]:
             features = layer(features, adj, mask=attention_mask)
-            features = self.activation(features)
+            features = self.gcn_activation(features)
         features = self.gcn_conv[-1](features, adj, mask=attention_mask)
-        return features
+        return self.output_activation(features)
