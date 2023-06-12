@@ -11,7 +11,7 @@ torch-spline-conv
 torch-geometric
 
 # Huggingface
-transformers==4.17.0
+transformers==4.30.0
 datasets==2.0.0
 
 # Other
